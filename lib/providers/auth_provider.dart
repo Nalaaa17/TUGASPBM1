@@ -5,7 +5,6 @@ import '../data/models/user_model.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
-/// Provider untuk state autentikasi di seluruh aplikasi
 class AuthProvider extends ChangeNotifier {
   AuthStatus _status = AuthStatus.unknown;
   UserModel? _user;
@@ -19,7 +18,6 @@ class AuthProvider extends ChangeNotifier {
   String get nim => _nim ?? '';
   String get className => _user?.className ?? '';
 
-  /// Cek token yang ada saat startup (auto-login)
   Future<void> tryAutoLogin() async {
     final hasToken = await TokenStorage.hasToken();
     if (hasToken) {
@@ -32,7 +30,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Login dengan NIM dan password
   Future<void> login(String nim, String password) async {
     _user = await AuthService.login(nim, password);
     _nim = _user!.nim.isEmpty ? nim : _user!.nim;
@@ -41,7 +38,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Logout dan reset state
   Future<void> logout() async {
     await AuthService.logout();
     _user = null;

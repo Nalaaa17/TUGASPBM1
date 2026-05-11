@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
-/// ThemeData Neo-Brutalism + Comic Book style
 class AppTheme {
   AppTheme._();
 
@@ -20,16 +19,13 @@ class AppTheme {
         brightness: Brightness.light,
       ),
 
-      // ── Scaffold ────────────────────────────────────
       scaffoldBackgroundColor: AppColors.background,
 
-      // ── Typography ──────────────────────────────────
       textTheme: GoogleFonts.nunitoTextTheme().apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
       ),
 
-      // ── AppBar (Kuning Brutalis) ─────────────────────
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.ink,
@@ -49,7 +45,6 @@ class AppTheme {
         ),
       ),
 
-      // ── ElevatedButton (Brutalis Bold) ──────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -69,15 +64,12 @@ class AppTheme {
         ),
       ),
 
-      // ── OutlinedButton ──────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
           side: const BorderSide(color: AppColors.border, width: 2.5),
           minimumSize: const Size(double.infinity, 54),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: GoogleFonts.spaceGrotesk(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -86,7 +78,6 @@ class AppTheme {
         ),
       ),
 
-      // ── TextButton ──────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.ink,
@@ -97,53 +88,45 @@ class AppTheme {
         ),
       ),
 
-      // ── FloatingActionButton ─────────────────────────
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.ink,
         elevation: 0,
       ),
 
-      // ── InputDecoration ──────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide:
-              const BorderSide(color: AppColors.border, width: 2),
+          borderSide: const BorderSide(color: AppColors.border, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide:
-              const BorderSide(color: AppColors.border, width: 2),
+          borderSide: const BorderSide(color: AppColors.border, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide:
-              const BorderSide(color: AppColors.primary, width: 3),
+          borderSide: const BorderSide(color: AppColors.primary, width: 3),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide:
-              const BorderSide(color: AppColors.error, width: 2),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide:
-              const BorderSide(color: AppColors.error, width: 3),
+          borderSide: const BorderSide(color: AppColors.error, width: 3),
         ),
         labelStyle: GoogleFonts.spaceGrotesk(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: AppColors.textSecondary,
         ),
-        hintStyle: GoogleFonts.nunito(
-          fontSize: 14,
-          color: AppColors.textHint,
-        ),
+        hintStyle: GoogleFonts.nunito(fontSize: 14, color: AppColors.textHint),
         errorStyle: GoogleFonts.nunito(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -151,7 +134,6 @@ class AppTheme {
         ),
       ),
 
-      // ── Card (Brutalis Shadow) ────────────────────────
       cardTheme: const CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -163,7 +145,6 @@ class AppTheme {
         margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
       ),
 
-      // ── Chip ─────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.primary,
         labelStyle: GoogleFonts.spaceGrotesk(
@@ -178,19 +159,20 @@ class AppTheme {
         ),
       ),
 
-      // ── SnackBar ─────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.ink,
         contentTextStyle: GoogleFonts.nunito(
-            fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: const BorderSide(color: AppColors.primary, width: 2),
         ),
       ),
 
-      // ── Dialog ───────────────────────────────────────
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(
@@ -211,7 +193,6 @@ class AppTheme {
         ),
       ),
 
-      // ── Divider ──────────────────────────────────────
       dividerTheme: const DividerThemeData(
         color: AppColors.border,
         thickness: 2,

@@ -68,24 +68,24 @@ class _SubmitScreenState extends State<SubmitScreen>
     super.dispose();
   }
 
-  String get _previewName =>
-      _nameController.text.trim().isEmpty
-          ? 'Nama Produk (Tugas Akhir)'
-          : _nameController.text.trim();
+  String get _previewName => _nameController.text.trim().isEmpty
+      ? 'Nama Produk (Tugas Akhir)'
+      : _nameController.text.trim();
 
   String get _previewPrice {
     final raw = _priceController.text.replaceAll(RegExp(r'[^\d]'), '');
     if (raw.isEmpty) return 'Rp 0';
     final num = double.tryParse(raw) ?? 0;
     return NumberFormat.currency(
-            locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
-        .format(num);
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(num);
   }
 
-  String get _previewDesc =>
-      _descriptionController.text.trim().isEmpty
-          ? 'Deskripsi tugas akhir kamu...'
-          : _descriptionController.text.trim();
+  String get _previewDesc => _descriptionController.text.trim().isEmpty
+      ? 'Deskripsi tugas akhir kamu...'
+      : _descriptionController.text.trim();
 
   String get _initials {
     final name = _nameController.text.trim();
@@ -145,13 +145,23 @@ class _SubmitScreenState extends State<SubmitScreen>
             children: [
               const Row(
                 children: [
-                  Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                   SizedBox(width: 8),
-                  Text(AppStrings.submitSuccess, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    AppStrings.submitSuccess,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               const SizedBox(height: 4),
-              Text(AppStrings.submitSuccessDetail, style: AppTextStyles.caption.copyWith(color: Colors.white70)),
+              Text(
+                AppStrings.submitSuccessDetail,
+                style: AppTextStyles.caption.copyWith(color: Colors.white70),
+              ),
             ],
           ),
           backgroundColor: AppColors.success,
@@ -171,10 +181,9 @@ class _SubmitScreenState extends State<SubmitScreen>
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: AppColors.error,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
   }
 
   @override
@@ -194,10 +203,8 @@ class _SubmitScreenState extends State<SubmitScreen>
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // ── Live Preview Card ───────────────────────
               _buildLivePreview(),
 
-              // ── Form ────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Form(
@@ -205,20 +212,25 @@ class _SubmitScreenState extends State<SubmitScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Info Banner ──────────────────
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryContainer.withValues(alpha: 0.4),
+                          color: AppColors.primaryContainer.withValues(
+                            alpha: 0.4,
+                          ),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.3)),
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.info_outline_rounded,
-                                color: AppColors.primaryDark, size: 20),
+                            const Icon(
+                              Icons.info_outline_rounded,
+                              color: AppColors.primaryDark,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -234,12 +246,12 @@ class _SubmitScreenState extends State<SubmitScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // ── Section header ──────────────────
                       _buildSectionHeader(
-                          'Informasi Tugas', Icons.assignment_outlined),
+                        'Informasi Tugas',
+                        Icons.assignment_outlined,
+                      ),
                       const SizedBox(height: 16),
 
-                      // Nama produk
                       CustomTextField(
                         controller: _nameController,
                         label: AppStrings.labelProductName,
@@ -250,29 +262,31 @@ class _SubmitScreenState extends State<SubmitScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // Harga
                       TextFormField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
                         textInputAction: TextInputAction.next,
                         style: AppTextStyles.bodyMedium,
                         decoration: InputDecoration(
                           labelText: AppStrings.labelPrice,
                           hintText: AppStrings.hintPrice,
-                          prefixIcon: const Icon(Icons.payments_outlined,
-                              color: AppColors.textSecondary, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.payments_outlined,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
                           prefixText: 'Rp  ',
                           prefixStyle: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         validator: Validators.price,
                       ),
                       const SizedBox(height: 16),
 
-                      // Deskripsi
                       CustomTextField(
                         controller: _descriptionController,
                         label: AppStrings.labelDescription,
@@ -284,7 +298,6 @@ class _SubmitScreenState extends State<SubmitScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // GitHub URL
                       CustomTextField(
                         controller: _githubController,
                         label: AppStrings.labelGithubUrl,
@@ -297,7 +310,6 @@ class _SubmitScreenState extends State<SubmitScreen>
 
                       const SizedBox(height: 32),
 
-                      // ── Buttons ─────────────────────────
                       ElevatedButton.icon(
                         onPressed: _isLoading ? null : _submitProduct,
                         icon: const Icon(Icons.send_rounded, size: 18),
@@ -356,7 +368,6 @@ class _SubmitScreenState extends State<SubmitScreen>
           ),
           const SizedBox(height: 14),
 
-          // Preview card
           ScaleTransition(
             scale: _previewAnimation,
             child: Container(
@@ -375,7 +386,6 @@ class _SubmitScreenState extends State<SubmitScreen>
               clipBehavior: Clip.antiAlias,
               child: Row(
                 children: [
-                  // Gradient side panel
                   Container(
                     width: 100,
                     decoration: BoxDecoration(
@@ -409,7 +419,9 @@ class _SubmitScreenState extends State<SubmitScreen>
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
@@ -428,7 +440,6 @@ class _SubmitScreenState extends State<SubmitScreen>
                     ),
                   ),
 
-                  // Info
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(14),
@@ -463,12 +474,15 @@ class _SubmitScreenState extends State<SubmitScreen>
                           const SizedBox(height: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.accentLight,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                  color: AppColors.accent.withValues(alpha: 0.5)),
+                                color: AppColors.accent.withValues(alpha: 0.5),
+                              ),
                             ),
                             child: Text(
                               _previewPrice,

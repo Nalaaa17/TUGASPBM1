@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import '../../core/utils/token_storage.dart';
 import '../../core/constants/app_strings.dart';
 
-/// Custom exception untuk error API
 class ApiException implements Exception {
   final String message;
   final int? statusCode;
@@ -15,30 +14,17 @@ class ApiException implements Exception {
   String toString() => 'ApiException($statusCode): $message';
 }
 
-/// HTTP Client dengan Bearer Token injection otomatis
-///
-/// ⚠️  KONFIGURASI: Ubah [baseUrl] dengan URL server API praktikum kamu
 class ApiService {
   ApiService._();
 
-  // ── KONFIGURASI ───────────────────────────────────────
-  // Base URL server API praktikum
   static const String baseUrl = 'https://task.itprojects.web.id';
 
   static const Duration _timeout = Duration(seconds: 30);
 
-  // ── Headers ───────────────────────────────────────────
-
-  /// Buat header standar tanpa auth (untuk login)
   static Map<String, String> _baseHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
+    return {'Content-Type': 'application/json', 'Accept': 'application/json'};
   }
 
-  /// Buat header dengan Bearer Token (untuk request terautentikasi)
-  /// WAJIB: Semua endpoint selain login harus menggunakan header ini
   static Future<Map<String, String>> _authHeaders() async {
     final token = await TokenStorage.getToken();
     if (token == null || token.isEmpty) {
@@ -54,9 +40,6 @@ class ApiService {
     };
   }
 
-  // ── HTTP Methods ──────────────────────────────────────
-
-  /// GET request dengan Bearer Token
   static Future<Map<String, dynamic>> get(String endpoint) async {
     try {
       final headers = await _authHeaders();
@@ -76,7 +59,6 @@ class ApiService {
     }
   }
 
-  /// GET request yang mengembalikan List
   static Future<List<dynamic>> getList(String endpoint) async {
     try {
       final headers = await _authHeaders();
@@ -94,9 +76,10 @@ class ApiService {
     }
   }
 
-  /// POST request tanpa auth (khusus login)
   static Future<Map<String, dynamic>> postPublic(
-      String endpoint, Map<String, dynamic> body) async {
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
     try {
       final response = await http
           .post(
@@ -116,9 +99,10 @@ class ApiService {
     }
   }
 
-  /// POST request dengan Bearer Token
   static Future<Map<String, dynamic>> post(
-      String endpoint, Map<String, dynamic> body) async {
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
     try {
       final headers = await _authHeaders();
       final response = await http
@@ -139,7 +123,6 @@ class ApiService {
     }
   }
 
-  /// DELETE request dengan Bearer Token
   static Future<Map<String, dynamic>> delete(String endpoint) async {
     try {
       final headers = await _authHeaders();
@@ -157,8 +140,6 @@ class ApiService {
     }
   }
 
-  // ── Response Handler ──────────────────────────────────
-
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final body = _decodeBody(response.body);
 
@@ -167,7 +148,8 @@ class ApiService {
       case 201:
         if (body is Map<String, dynamic>) {
           if (body['success'] == false) {
-            final msg = body['message']?.toString() ?? 'Gagal memproses permintaan.';
+            final msg =
+                body['message']?.toString() ?? 'Gagal memproses permintaan.';
             throw ApiException(msg, statusCode: response.statusCode);
           }
           return body;
@@ -175,7 +157,6 @@ class ApiService {
         return {'data': body};
 
       case 401:
-        // Token tidak valid atau expired — paksa logout
         throw ApiException(
           'Sesi kamu sudah berakhir. Silakan login kembali.',
           statusCode: 401,
@@ -188,21 +169,19 @@ class ApiService {
         );
 
       case 404:
-        throw ApiException(
-          'Data tidak ditemukan di server.',
-          statusCode: 404,
-        );
+        throw ApiException('Data tidak ditemukan di server.', statusCode: 404);
 
       case 422:
-        // Validation error dari server
         final errors = body['errors'] ?? body['message'] ?? 'Data tidak valid';
         throw ApiException(errors.toString(), statusCode: response.statusCode);
 
       case 500:
       case 502:
       case 503:
-        throw ApiException(AppStrings.errorServer,
-            statusCode: response.statusCode);
+        throw ApiException(
+          AppStrings.errorServer,
+          statusCode: response.statusCode,
+        );
 
       default:
         final message = body['message']?.toString() ?? AppStrings.errorUnknown;
@@ -220,17 +199,17 @@ class ApiService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (body is List) return body;
       if (body is Map<String, dynamic>) {
-        // Response API praktikum: { "success": true, "products": [...] }
         if (body['products'] is List) return body['products'] as List;
-        // Fallback lain
         if (body['data'] is List) return body['data'] as List;
         if (body['items'] is List) return body['items'] as List;
       }
       return [];
     }
 
-    throw ApiException(AppStrings.errorUnknown,
-        statusCode: response.statusCode);
+    throw ApiException(
+      AppStrings.errorUnknown,
+      statusCode: response.statusCode,
+    );
   }
 
   static dynamic _decodeBody(String body) {

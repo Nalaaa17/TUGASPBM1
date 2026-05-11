@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 
-/// Overlay loading yang mencegah interaksi user saat request sedang berlangsung
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
   final Widget child;
@@ -26,7 +25,9 @@ class LoadingOverlay extends StatelessWidget {
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 32, vertical: 24),
+                  horizontal: 32,
+                  vertical: 24,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),

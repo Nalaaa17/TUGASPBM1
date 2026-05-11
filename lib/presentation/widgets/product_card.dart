@@ -5,7 +5,6 @@ import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../data/models/product_model.dart';
 
-// Daftar warna solid kartu ala Comic Panel (bergilir berdasarkan index)
 const List<Color> _cardColors = [
   AppColors.panelBlue,
   AppColors.panelPink,
@@ -15,7 +14,6 @@ const List<Color> _cardColors = [
   Color(0xFF00E5FF), // Cyan terang
 ];
 
-/// Ambil inisial dari nama produk
 String _initials(String name) {
   final words = name.trim().split(' ');
   if (words.isEmpty || words[0].isEmpty) return '?';
@@ -23,7 +21,6 @@ String _initials(String name) {
   return '${words[0][0]}${words[1][0]}'.toUpperCase();
 }
 
-/// Widget kartu produk kreatif — Grid mode
 class ProductCard extends StatelessWidget {
   final ProductModel product;
   final VoidCallback? onDelete;
@@ -47,8 +44,7 @@ class ProductCard extends StatelessWidget {
     return formatter.format(product.price);
   }
 
-  Color get _cardColor =>
-      _cardColors[index % _cardColors.length];
+  Color get _cardColor => _cardColors[index % _cardColors.length];
 
   void _confirmDelete(BuildContext context) {
     showDialog(
@@ -63,8 +59,11 @@ class ProductCard extends StatelessWidget {
                 color: AppColors.errorLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.delete_outline_rounded,
-                  color: AppColors.error, size: 20),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: AppColors.error,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             const Expanded(child: Text(AppStrings.deleteConfirmTitle)),
@@ -117,186 +116,188 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header Panel ───────────────────────────
               Container(
                 height: 100,
                 decoration: BoxDecoration(
                   color: _cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
-                  border: const Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(9),
+                  ),
+                  border: const Border(
+                    bottom: BorderSide(color: AppColors.ink, width: 3),
+                  ),
                 ),
-              child: Stack(
-                children: [
-                  // Inisial produk
-                  Positioned(
-                    left: 14,
-                    bottom: 14,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _initials(product.name),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Badge DRAFT
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            width: 1),
-                      ),
-                      child: const Text(
-                        'DRAFT',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Tombol delete
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () => _confirmDelete(context),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.delete_outline_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Konten ────────────────────────────────────
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    // Nama produk
-                    Text(
-                      product.name,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Deskripsi
-                    Expanded(
-                      child: Text(
-                        product.description,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          fontSize: 11,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    // Harga + lihat detail
-                    Row(
-                      children: [
-                        // Badge harga
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                    Positioned(
+                      left: 14,
+                      bottom: 14,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.accent.withValues(alpha: 0.2),
-                                  AppColors.accentLight,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                  color: AppColors.accent.withValues(alpha: 0.4),
-                                  width: 1),
+                              color: Colors.white.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(
-                              _formattedPrice,
-                              style: AppTextStyles.priceTag.copyWith(
-                                fontSize: 12,
+                            child: Center(
+                              child: Text(
+                                _initials(product.name),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 3,
                         ),
-                        const SizedBox(width: 6),
-                        // Detail button
-                        GestureDetector(
-                          onTap: () => _showDetailSheet(context),
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: _cardColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 12,
-                              color: _cardColor,
-                            ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            width: 1,
                           ),
                         ),
-                      ],
+                        child: const Text(
+                          'DRAFT',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: () => _confirmDelete(context),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+
+                      Expanded(
+                        child: Text(
+                          product.description,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            fontSize: 11,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.accent.withValues(alpha: 0.2),
+                                    AppColors.accentLight,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: AppColors.accent.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                _formattedPrice,
+                                style: AppTextStyles.priceTag.copyWith(
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () => _showDetailSheet(context),
+                            child: Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: _cardColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 12,
+                                color: _cardColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -318,138 +319,153 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(9),
           onTap: () => _showDetailSheet(context),
           child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              // Avatar dengan inisial + gradient
-              Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  color: _cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.ink, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    _initials(product.name),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: _cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.ink, width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _initials(product.name),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 14),
+                const SizedBox(width: 14),
 
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Nama + badge draft
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            product.name,
-                            style: AppTextStyles.labelLarge.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryContainer.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Text(
-                            'DRAFT',
-                            style: TextStyle(
-                              fontSize: 8,
-                              color: AppColors.primaryDark,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              product.name,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      product.description,
-                      style: AppTextStyles.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    // Harga + tanggal
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.accentLight,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.4),
-                                width: 1),
-                          ),
-                          child: Text(
-                            _formattedPrice,
-                            style: AppTextStyles.priceTag,
-                          ),
-                        ),
-                        if (product.createdAt != null) ...[
-                          const SizedBox(width: 8),
-                          Icon(Icons.schedule_rounded,
-                              size: 11, color: AppColors.textHint),
-                          const SizedBox(width: 3),
-                          Text(
-                            _formatDate(product.createdAt!),
-                            style: AppTextStyles.caption,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryContainer.withValues(
+                                alpha: 0.5,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Text(
+                              'DRAFT',
+                              style: TextStyle(
+                                fontSize: 8,
+                                color: AppColors.primaryDark,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1,
+                              ),
+                            ),
                           ),
                         ],
-                      ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        product.description,
+                        style: AppTextStyles.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.accentLight,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: AppColors.accent.withValues(alpha: 0.4),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              _formattedPrice,
+                              style: AppTextStyles.priceTag,
+                            ),
+                          ),
+                          if (product.createdAt != null) ...[
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.schedule_rounded,
+                              size: 11,
+                              color: AppColors.textHint,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              _formatDate(product.createdAt!),
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => _showDetailSheet(context),
+                      icon: Icon(
+                        Icons.info_outline_rounded,
+                        color: _cardColor,
+                        size: 20,
+                      ),
+                      tooltip: 'Detail',
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                    IconButton(
+                      onPressed: () => _confirmDelete(context),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppColors.error,
+                        size: 20,
+                      ),
+                      tooltip: 'Hapus',
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
+                      ),
+                      padding: EdgeInsets.zero,
                     ),
                   ],
                 ),
-              ),
-
-              // Actions
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () => _showDetailSheet(context),
-                    icon: Icon(Icons.info_outline_rounded,
-                        color: _cardColor, size: 20),
-                    tooltip: 'Detail',
-                    constraints: const BoxConstraints(
-                        minWidth: 36, minHeight: 36),
-                    padding: EdgeInsets.zero,
-                  ),
-                  IconButton(
-                    onPressed: () => _confirmDelete(context),
-                    icon: const Icon(Icons.delete_outline_rounded,
-                        color: AppColors.error, size: 20),
-                    tooltip: 'Hapus',
-                    constraints: const BoxConstraints(
-                        minWidth: 36, minHeight: 36),
-                    padding: EdgeInsets.zero,
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -458,7 +474,6 @@ class ProductCard extends StatelessWidget {
     return '${dt.day}/${dt.month}/${dt.year}';
   }
 
-  /// Bottom sheet untuk detail produk
   void _showDetailSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -475,7 +490,6 @@ class ProductCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Handle
               Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 40,
@@ -486,7 +500,6 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
 
-              // Header gradient dalam bottom sheet
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(18),
@@ -495,7 +508,11 @@ class ProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: AppColors.ink, width: 3),
                   boxShadow: const [
-                    BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+                    BoxShadow(
+                      color: AppColors.ink,
+                      offset: Offset(4, 4),
+                      blurRadius: 0,
+                    ),
                   ],
                 ),
                 child: Row(
@@ -549,51 +566,75 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
 
-              // Detail info
               Expanded(
                 child: ListView(
                   controller: scrollCtrl,
                   padding: const EdgeInsets.all(20),
                   children: [
-                    _detailRow(Icons.description_outlined,
-                        'Deskripsi', product.description),
+                    _detailRow(
+                      Icons.description_outlined,
+                      'Deskripsi',
+                      product.description,
+                    ),
                     const SizedBox(height: 12),
-                    _detailRow(Icons.payments_outlined,
-                        'Harga', _formattedPrice),
+                    _detailRow(
+                      Icons.payments_outlined,
+                      'Harga',
+                      _formattedPrice,
+                    ),
                     const SizedBox(height: 12),
                     if (product.userId != null)
-                      _detailRow(Icons.badge_outlined,
-                          'NIM Pemilik', product.userId!),
+                      _detailRow(
+                        Icons.badge_outlined,
+                        'NIM Pemilik',
+                        product.userId!,
+                      ),
                     if (product.userId != null) const SizedBox(height: 12),
                     if (product.ownerName != null)
-                      _detailRow(Icons.person_outline_rounded,
-                          'Nama Pemilik', product.ownerName!),
+                      _detailRow(
+                        Icons.person_outline_rounded,
+                        'Nama Pemilik',
+                        product.ownerName!,
+                      ),
                     if (product.ownerName != null) const SizedBox(height: 12),
                     if (product.ownerClass != null)
-                      _detailRow(Icons.class_outlined,
-                          'Kelas', product.ownerClass!),
+                      _detailRow(
+                        Icons.class_outlined,
+                        'Kelas',
+                        product.ownerClass!,
+                      ),
                     if (product.ownerClass != null) const SizedBox(height: 12),
                     if (product.createdAt != null)
-                      _detailRow(Icons.schedule_rounded, 'Dibuat pada',
-                          _fullDate(product.createdAt!)),
+                      _detailRow(
+                        Icons.schedule_rounded,
+                        'Dibuat pada',
+                        _fullDate(product.createdAt!),
+                      ),
                     const SizedBox(height: 12),
-                    _detailRow(Icons.lock_outline, 'Visibilitas',
-                        'Hanya kamu & asisten praktikum'),
+                    _detailRow(
+                      Icons.lock_outline,
+                      'Visibilitas',
+                      'Hanya kamu & asisten praktikum',
+                    ),
                     const SizedBox(height: 24),
 
-                    // Hapus button
                     OutlinedButton.icon(
                       onPressed: () {
                         Navigator.of(ctx).pop();
                         _confirmDelete(context);
                       },
-                      icon: const Icon(Icons.delete_outline_rounded,
-                          color: AppColors.error, size: 18),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppColors.error,
+                        size: 18,
+                      ),
                       label: const Text('Hapus Draft Ini'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.error,
                         side: const BorderSide(
-                            color: AppColors.error, width: 1.5),
+                          color: AppColors.error,
+                          width: 1.5,
+                        ),
                         minimumSize: const Size(double.infinity, 48),
                       ),
                     ),
@@ -642,16 +683,24 @@ class ProductCard extends StatelessWidget {
 
   String _fullDate(DateTime dt) {
     const months = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Ags',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
     ];
     return '${dt.day} ${months[dt.month]} ${dt.year}, ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 }
 
-// ─── Shimmer Loading ──────────────────────────────────────────────────────────
-
-/// Widget shimmer loading untuk grid
 class ProductCardShimmer extends StatefulWidget {
   const ProductCardShimmer({super.key});
 
@@ -671,9 +720,10 @@ class _ProductCardShimmerState extends State<ProductCardShimmer>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.3,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -694,7 +744,11 @@ class _ProductCardShimmerState extends State<ProductCardShimmer>
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.ink, width: 3),
             boxShadow: const [
-              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.ink,
+                offset: Offset(4, 4),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: Column(
@@ -706,8 +760,12 @@ class _ProductCardShimmerState extends State<ProductCardShimmer>
                   height: 100,
                   decoration: const BoxDecoration(
                     color: AppColors.shimmerBase,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
-                    border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(9),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(color: AppColors.ink, width: 3),
+                    ),
                   ),
                   child: Center(
                     child: Container(

@@ -10,7 +10,6 @@ import '../../data/services/api_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/loading_overlay.dart';
 
-// Gradients untuk preview (sama dengan ProductCard)
 const List<List<Color>> _previewGradients = [
   [Color(0xFF1E88E5), Color(0xFF42A5F5)],
   [Color(0xFF6C63FF), Color(0xFF9C8FFF)],
@@ -53,7 +52,6 @@ class _AddProductScreenState extends State<AddProductScreen>
       curve: Curves.easeOutBack,
     );
 
-    // Trigger rebuild saat input berubah untuk live preview
     _nameController.addListener(() => setState(() {}));
     _priceController.addListener(() => setState(() {}));
     _descriptionController.addListener(() => setState(() {}));
@@ -68,24 +66,24 @@ class _AddProductScreenState extends State<AddProductScreen>
     super.dispose();
   }
 
-  String get _previewName =>
-      _nameController.text.trim().isEmpty
-          ? 'Nama Produk'
-          : _nameController.text.trim();
+  String get _previewName => _nameController.text.trim().isEmpty
+      ? 'Nama Produk'
+      : _nameController.text.trim();
 
   String get _previewPrice {
     final raw = _priceController.text.replaceAll(RegExp(r'[^\d]'), '');
     if (raw.isEmpty) return 'Rp 0';
     final num = double.tryParse(raw) ?? 0;
     return NumberFormat.currency(
-            locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
-        .format(num);
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(num);
   }
 
-  String get _previewDesc =>
-      _descriptionController.text.trim().isEmpty
-          ? 'Deskripsi produk kamu akan muncul di sini...'
-          : _descriptionController.text.trim();
+  String get _previewDesc => _descriptionController.text.trim().isEmpty
+      ? 'Deskripsi produk kamu akan muncul di sini...'
+      : _descriptionController.text.trim();
 
   String get _initials {
     final name = _nameController.text.trim();
@@ -137,10 +135,9 @@ class _AddProductScreenState extends State<AddProductScreen>
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: AppColors.error,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
   }
 
   @override
@@ -160,10 +157,8 @@ class _AddProductScreenState extends State<AddProductScreen>
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // ── Live Preview Card ───────────────────────
               _buildLivePreview(),
 
-              // ── Form ────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Form(
@@ -171,20 +166,23 @@ class _AddProductScreenState extends State<AddProductScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Warning Banner ──────────────────
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: AppColors.warningLight,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                              color: AppColors.warning.withValues(alpha: 0.5)),
+                            color: AppColors.warning.withValues(alpha: 0.5),
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.warning_amber_rounded,
-                                color: AppColors.warning, size: 20),
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: AppColors.warning,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -200,16 +198,15 @@ class _AddProductScreenState extends State<AddProductScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // ── Pilih Warna Kartu ───────────────
                       _buildColorPicker(),
                       const SizedBox(height: 20),
 
-                      // ── Section header ──────────────────
                       _buildSectionHeader(
-                          'Informasi Produk', Icons.inventory_2_outlined),
+                        'Informasi Produk',
+                        Icons.inventory_2_outlined,
+                      ),
                       const SizedBox(height: 16),
 
-                      // Nama produk
                       CustomTextField(
                         controller: _nameController,
                         label: AppStrings.labelProductName,
@@ -220,29 +217,31 @@ class _AddProductScreenState extends State<AddProductScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // Harga
                       TextFormField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
                         textInputAction: TextInputAction.next,
                         style: AppTextStyles.bodyMedium,
                         decoration: InputDecoration(
                           labelText: AppStrings.labelPrice,
                           hintText: AppStrings.hintPrice,
-                          prefixIcon: const Icon(Icons.payments_outlined,
-                              color: AppColors.textSecondary, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.payments_outlined,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
                           prefixText: 'Rp  ',
                           prefixStyle: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         validator: Validators.price,
                       ),
                       const SizedBox(height: 16),
 
-                      // Deskripsi
                       CustomTextField(
                         controller: _descriptionController,
                         label: AppStrings.labelDescription,
@@ -254,26 +253,32 @@ class _AddProductScreenState extends State<AddProductScreen>
                       ),
                       const SizedBox(height: 10),
 
-                      // Peringatan konten
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.errorLight,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppColors.error.withValues(alpha: 0.25)),
+                            color: AppColors.error.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.block_rounded,
-                                size: 13, color: AppColors.error),
+                            const Icon(
+                              Icons.block_rounded,
+                              size: 13,
+                              color: AppColors.error,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 'Dilarang: konten politik, SARA, pornografi, atau ujaran kebencian',
-                                style: AppTextStyles.caption
-                                    .copyWith(color: AppColors.error),
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.error,
+                                ),
                               ),
                             ),
                           ],
@@ -282,7 +287,6 @@ class _AddProductScreenState extends State<AddProductScreen>
 
                       const SizedBox(height: 32),
 
-                      // ── Buttons ─────────────────────────
                       ElevatedButton.icon(
                         onPressed: _isLoading ? null : _saveProduct,
                         icon: const Icon(Icons.save_rounded, size: 18),
@@ -337,7 +341,6 @@ class _AddProductScreenState extends State<AddProductScreen>
           ),
           const SizedBox(height: 14),
 
-          // Preview card
           ScaleTransition(
             scale: _previewAnimation,
             child: Container(
@@ -356,7 +359,6 @@ class _AddProductScreenState extends State<AddProductScreen>
               clipBehavior: Clip.antiAlias,
               child: Row(
                 children: [
-                  // Gradient side panel
                   Container(
                     width: 100,
                     decoration: BoxDecoration(
@@ -390,7 +392,9 @@ class _AddProductScreenState extends State<AddProductScreen>
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
@@ -409,7 +413,6 @@ class _AddProductScreenState extends State<AddProductScreen>
                     ),
                   ),
 
-                  // Info
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(14),
@@ -444,12 +447,15 @@ class _AddProductScreenState extends State<AddProductScreen>
                           const SizedBox(height: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.accentLight,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                  color: AppColors.accent.withValues(alpha: 0.5)),
+                                color: AppColors.accent.withValues(alpha: 0.5),
+                              ),
                             ),
                             child: Text(
                               _previewPrice,
@@ -475,8 +481,11 @@ class _AddProductScreenState extends State<AddProductScreen>
       children: [
         Row(
           children: [
-            const Icon(Icons.palette_outlined,
-                size: 16, color: AppColors.primary),
+            const Icon(
+              Icons.palette_outlined,
+              size: 16,
+              color: AppColors.primary,
+            ),
             const SizedBox(width: 6),
             Text(
               'Warna Kartu',
@@ -508,22 +517,27 @@ class _AddProductScreenState extends State<AddProductScreen>
                   border: isSelected
                       ? Border.all(
                           color: _previewGradients[i][0].withValues(alpha: 0.6),
-                          width: 3)
+                          width: 3,
+                        )
                       : null,
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: _previewGradients[i][0]
-                                .withValues(alpha: 0.4),
+                            color: _previewGradients[i][0].withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
-                          )
+                          ),
                         ]
                       : null,
                 ),
                 child: isSelected
-                    ? const Icon(Icons.check_rounded,
-                        color: Colors.white, size: 20)
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      )
                     : null,
               ),
             );

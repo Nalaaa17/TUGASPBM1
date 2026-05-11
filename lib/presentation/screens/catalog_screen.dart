@@ -55,10 +55,12 @@ class _CatalogScreenState extends State<CatalogScreen>
       _filtered = q.isEmpty
           ? List.from(_products)
           : _products
-              .where((p) =>
-                  p.name.toLowerCase().contains(q) ||
-                  p.description.toLowerCase().contains(q))
-              .toList();
+                .where(
+                  (p) =>
+                      p.name.toLowerCase().contains(q) ||
+                      p.description.toLowerCase().contains(q),
+                )
+                .toList();
     });
   }
 
@@ -72,17 +74,18 @@ class _CatalogScreenState extends State<CatalogScreen>
       if (!mounted) return;
       setState(() {
         _products = products.where((p) => !p.isDeleted).toList();
-        
-        // Re-apply search filter if it exists
+
         final q = _searchCtrl.text.trim().toLowerCase();
         _filtered = q.isEmpty
             ? List.from(_products)
             : _products
-                .where((p) =>
-                    p.name.toLowerCase().contains(q) ||
-                    p.description.toLowerCase().contains(q))
-                .toList();
-                
+                  .where(
+                    (p) =>
+                        p.name.toLowerCase().contains(q) ||
+                        p.description.toLowerCase().contains(q),
+                  )
+                  .toList();
+
         _isLoading = false;
       });
     } on ApiException catch (e) {
@@ -105,7 +108,6 @@ class _CatalogScreenState extends State<CatalogScreen>
   }
 
   Future<void> _deleteProduct(int index) async {
-    // index di _filtered
     final product = _filtered[index];
     setState(() => _isDeleting = true);
     try {
@@ -124,7 +126,6 @@ class _CatalogScreenState extends State<CatalogScreen>
         _handleUnauthorized();
         return;
       }
-      // Soft delete tetap di client
       setState(() {
         _products.removeWhere((p) => p.id == product.id);
         _filtered.removeAt(index);
@@ -149,11 +150,10 @@ class _CatalogScreenState extends State<CatalogScreen>
   }
 
   Future<void> _navigateToAddProduct() async {
-    final added = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const AddProductScreen()),
-    );
+    final added = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const AddProductScreen()));
     if (added == true) {
-      // Clear search to ensure new product is visible
       _searchCtrl.clear();
       setState(() {
         _showSearch = false;
@@ -163,14 +163,13 @@ class _CatalogScreenState extends State<CatalogScreen>
   }
 
   Future<void> _navigateToSubmit() async {
-    final submitted = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const SubmitScreen()),
-    );
+    final submitted = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const SubmitScreen()));
     if (submitted == true) {
       _loadProducts();
     }
   }
-
 
   Future<void> _logout() async {
     final confirm = await showDialog<bool>(
@@ -203,33 +202,38 @@ class _CatalogScreenState extends State<CatalogScreen>
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: AppColors.error,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
   }
 
   void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Row(
-        children: [
-          const Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Text(message),
-        ],
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(message),
+          ],
+        ),
+        backgroundColor: AppColors.success,
       ),
-      backgroundColor: AppColors.success,
-    ));
+    );
   }
 
-  // ── Total harga semua produk ──────────────────────────
-  double get _totalValue =>
-      _products.fold(0, (sum, p) => sum + p.price);
+  double get _totalValue => _products.fold(0, (sum, p) => sum + p.price);
 
   String get _formattedTotal {
     return NumberFormat.currency(
-            locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
-        .format(_totalValue);
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(_totalValue);
   }
 
   @override
@@ -247,7 +251,6 @@ class _CatalogScreenState extends State<CatalogScreen>
         message: 'Menghapus produk...',
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            // ── SliverAppBar ────────────────────────────
             SliverAppBar(
               expandedHeight: 200,
               floating: false,
@@ -277,22 +280,12 @@ class _CatalogScreenState extends State<CatalogScreen>
               ),
             ),
 
-            // ── Stats Header ────────────────────────────
             if (!_isLoading && _error == null)
-              SliverToBoxAdapter(
-                child: _buildStatsRow(),
-              ),
+              SliverToBoxAdapter(child: _buildStatsRow()),
 
-            // ── Search Bar ───────────────────────────────
-            if (_showSearch)
-              SliverToBoxAdapter(
-                child: _buildSearchBar(),
-              ),
+            if (_showSearch) SliverToBoxAdapter(child: _buildSearchBar()),
 
-            // ── Filter Row ───────────────────────────────
-            SliverToBoxAdapter(
-              child: _buildFilterRow(),
-            ),
+            SliverToBoxAdapter(child: _buildFilterRow()),
           ],
           body: RefreshIndicator(
             color: AppColors.primary,
@@ -310,7 +303,11 @@ class _CatalogScreenState extends State<CatalogScreen>
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.ink, width: 2.5),
             boxShadow: const [
-              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.ink,
+                offset: Offset(4, 4),
+                blurRadius: 0,
+              ),
             ],
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
@@ -322,8 +319,10 @@ class _CatalogScreenState extends State<CatalogScreen>
               Text(
                 'TAMBAH DRAFT',
                 style: GoogleFonts.spaceGrotesk(
-                  fontSize: 13, fontWeight: FontWeight.w800,
-                  color: AppColors.ink, letterSpacing: 1.0,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  letterSpacing: 1.0,
                 ),
               ),
             ],
@@ -336,7 +335,6 @@ class _CatalogScreenState extends State<CatalogScreen>
 
   List<Widget> _buildActions() {
     return [
-      // Search toggle
       IconButton(
         tooltip: 'Cari Produk',
         icon: Icon(
@@ -353,7 +351,7 @@ class _CatalogScreenState extends State<CatalogScreen>
           });
         },
       ),
-      // Grid/list toggle
+
       IconButton(
         tooltip: _isGridView ? 'Tampilan List' : 'Tampilan Grid',
         icon: Icon(
@@ -362,7 +360,7 @@ class _CatalogScreenState extends State<CatalogScreen>
         ),
         onPressed: () => setState(() => _isGridView = !_isGridView),
       ),
-      // Menu
+
       PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -378,8 +376,13 @@ class _CatalogScreenState extends State<CatalogScreen>
               children: [
                 Icon(Icons.send_rounded, size: 18, color: AppColors.success),
                 SizedBox(width: 10),
-                Text(AppStrings.submitTitle,
-                    style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
+                Text(
+                  AppStrings.submitTitle,
+                  style: TextStyle(
+                    color: AppColors.success,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -429,7 +432,6 @@ class _CatalogScreenState extends State<CatalogScreen>
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
               child: Row(
                 children: [
-                  // Avatar Box
                   Container(
                     width: 64,
                     height: 64,
@@ -438,12 +440,18 @@ class _CatalogScreenState extends State<CatalogScreen>
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: AppColors.ink, width: 3),
                       boxShadow: const [
-                        BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+                        BoxShadow(
+                          color: AppColors.ink,
+                          offset: Offset(4, 4),
+                          blurRadius: 0,
+                        ),
                       ],
                     ),
                     child: Center(
                       child: Text(
-                        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                        displayName.isNotEmpty
+                            ? displayName[0].toUpperCase()
+                            : 'U',
                         style: GoogleFonts.bangers(
                           fontSize: 36,
                           color: AppColors.ink,
@@ -459,7 +467,10 @@ class _CatalogScreenState extends State<CatalogScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.comicRed,
                             borderRadius: const BorderRadius.only(
@@ -468,15 +479,24 @@ class _CatalogScreenState extends State<CatalogScreen>
                               bottomRight: Radius.circular(12),
                               bottomLeft: Radius.circular(0),
                             ),
-                            border: Border.all(color: AppColors.ink, width: 2.5),
+                            border: Border.all(
+                              color: AppColors.ink,
+                              width: 2.5,
+                            ),
                             boxShadow: const [
-                              BoxShadow(color: AppColors.ink, offset: Offset(2, 2), blurRadius: 0),
+                              BoxShadow(
+                                color: AppColors.ink,
+                                offset: Offset(2, 2),
+                                blurRadius: 0,
+                              ),
                             ],
                           ),
                           child: Text(
                             'HALO! 👋',
                             style: GoogleFonts.bangers(
-                              fontSize: 14, color: Colors.white, letterSpacing: 1.5,
+                              fontSize: 14,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
                             ),
                           ),
                         ),
@@ -494,11 +514,17 @@ class _CatalogScreenState extends State<CatalogScreen>
                         if (nim.isNotEmpty)
                           Container(
                             margin: const EdgeInsets.only(top: 4),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.accent,
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.ink, width: 1.5),
+                              border: Border.all(
+                                color: AppColors.ink,
+                                width: 1.5,
+                              ),
                             ),
                             child: Text(
                               'NIM: $nim',
@@ -568,7 +594,11 @@ class _CatalogScreenState extends State<CatalogScreen>
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.ink, width: 2.5),
           boxShadow: const [
-            BoxShadow(color: AppColors.ink, offset: Offset(3, 3), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.ink,
+              offset: Offset(3, 3),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: Column(
@@ -610,7 +640,11 @@ class _CatalogScreenState extends State<CatalogScreen>
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.ink, width: 3),
           boxShadow: const [
-            BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.ink,
+              offset: Offset(4, 4),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: TextField(
@@ -619,20 +653,28 @@ class _CatalogScreenState extends State<CatalogScreen>
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
             hintText: 'Cari nama atau deskripsi produk...',
-            prefixIcon: const Icon(Icons.search_rounded,
-                color: AppColors.primary, size: 20),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
             suffixIcon: _searchCtrl.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear_rounded,
-                        size: 18, color: AppColors.textSecondary),
+                    icon: const Icon(
+                      Icons.clear_rounded,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
                     onPressed: () {
                       _searchCtrl.clear();
                       setState(() => _filtered = List.from(_products));
                     },
                   )
                 : null,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: InputBorder.none,
           ),
         ),
@@ -645,7 +687,6 @@ class _CatalogScreenState extends State<CatalogScreen>
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       child: Row(
         children: [
-          // Jumlah produk
           Expanded(
             child: Text(
               _searchCtrl.text.isEmpty
@@ -656,7 +697,7 @@ class _CatalogScreenState extends State<CatalogScreen>
               ),
             ),
           ),
-          // Sort/filter icon (visual only)
+
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
@@ -664,14 +705,21 @@ class _CatalogScreenState extends State<CatalogScreen>
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.ink, width: 2),
               boxShadow: const [
-                BoxShadow(color: AppColors.ink, offset: Offset(2, 2), blurRadius: 0),
+                BoxShadow(
+                  color: AppColors.ink,
+                  offset: Offset(2, 2),
+                  blurRadius: 0,
+                ),
               ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.sort_rounded,
-                    size: 14, color: AppColors.primary),
+                const Icon(
+                  Icons.sort_rounded,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   _isGridView ? 'Grid' : 'List',
@@ -699,9 +747,11 @@ class _CatalogScreenState extends State<CatalogScreen>
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
-              // Ikon katalog
-              const Icon(Icons.inventory_2_rounded,
-                  color: AppColors.primary, size: 22),
+              const Icon(
+                Icons.inventory_2_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -722,16 +772,22 @@ class _CatalogScreenState extends State<CatalogScreen>
                   ],
                 ),
               ),
-              // Badge jumlah
+
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 6),
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: AppColors.ink, width: 2.5),
                   boxShadow: const [
-                    BoxShadow(color: AppColors.ink, offset: Offset(3, 3), blurRadius: 0),
+                    BoxShadow(
+                      color: AppColors.ink,
+                      offset: Offset(3, 3),
+                      blurRadius: 0,
+                    ),
                   ],
                 ),
                 child: Text(
@@ -768,14 +824,18 @@ class _CatalogScreenState extends State<CatalogScreen>
                   color: AppColors.errorLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.wifi_off_rounded,
-                    size: 36, color: AppColors.error),
+                child: const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 36,
+                  color: AppColors.error,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 _error!,
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -808,12 +868,18 @@ class _CatalogScreenState extends State<CatalogScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.search_off_rounded,
-                size: 56, color: AppColors.textHint),
+            const Icon(
+              Icons.search_off_rounded,
+              size: 56,
+              color: AppColors.textHint,
+            ),
             const SizedBox(height: 12),
-            Text('Produk tidak ditemukan',
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.textSecondary)),
+            Text(
+              'Produk tidak ditemukan',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
             const SizedBox(height: 8),
             TextButton.icon(
               onPressed: () {
@@ -884,8 +950,6 @@ class _CatalogScreenState extends State<CatalogScreen>
   }
 }
 
-// ─── List Shimmer Item ────────────────────────────────────────────────────────
-
 class _ListShimmerItem extends StatefulWidget {
   const _ListShimmerItem();
 
@@ -902,10 +966,13 @@ class _ListShimmerItemState extends State<_ListShimmerItem>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1400))
-      ..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.3, end: 1.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+    _anim = Tween<double>(
+      begin: 0.3,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -922,8 +989,9 @@ class _ListShimmerItemState extends State<_ListShimmerItem>
         opacity: _anim.value,
         child: Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
@@ -942,25 +1010,31 @@ class _ListShimmerItemState extends State<_ListShimmerItem>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                          height: 14,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              color: AppColors.shimmerBase,
-                              borderRadius: BorderRadius.circular(4))),
+                        height: 14,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppColors.shimmerBase,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       Container(
-                          height: 12,
-                          width: 160,
-                          decoration: BoxDecoration(
-                              color: AppColors.shimmerBase,
-                              borderRadius: BorderRadius.circular(4))),
+                        height: 12,
+                        width: 160,
+                        decoration: BoxDecoration(
+                          color: AppColors.shimmerBase,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Container(
-                          height: 24,
-                          width: 100,
-                          decoration: BoxDecoration(
-                              color: AppColors.accentLight,
-                              borderRadius: BorderRadius.circular(8))),
+                        height: 24,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: AppColors.accentLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -973,7 +1047,6 @@ class _ListShimmerItemState extends State<_ListShimmerItem>
   }
 }
 
-/// CustomPainter — Halftone dot pattern background untuk nuansa komik
 class _ComicDotPainter extends CustomPainter {
   final Color color;
   final double spacing;

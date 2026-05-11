@@ -17,12 +17,14 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: AppColors.primary,
-    statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: AppColors.background,
-    systemNavigationBarIconBrightness: Brightness.dark,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: AppColors.primary,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: AppColors.background,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   runApp(const MyApp());
 }
@@ -48,7 +50,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Splash Screen — Neo-Brutalism Comic Book Style
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -83,13 +84,15 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.0, 0.5, curve: Curves.easeIn)),
+        parent: _mainController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+      ),
     );
     _slideAnimation = Tween<double>(begin: 40.0, end: 0.0).animate(
       CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.3, 1.0, curve: Curves.easeOut)),
+        parent: _mainController,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+      ),
     );
     _floatAnimation = Tween<double>(begin: -5.0, end: 5.0).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
@@ -114,16 +117,15 @@ class _SplashScreenState extends State<SplashScreen>
     await auth.tryAutoLogin();
     if (!mounted) return;
 
-    final destination =
-        auth.isLoggedIn ? const CatalogScreen() : const LoginScreen();
+    final destination = auth.isLoggedIn
+        ? const CatalogScreen()
+        : const LoginScreen();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (ctx, anim, _) => destination,
-        transitionsBuilder: (ctx, anim, _, child) => FadeTransition(
-          opacity: anim,
-          child: child,
-        ),
+        transitionsBuilder: (ctx, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 400),
       ),
     );
@@ -135,16 +137,13 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.primary,
       body: Stack(
         children: [
-          // ── Dot Pattern Background ─────────────────────
           Positioned.fill(child: _buildDotPattern()),
 
-          // ── Decorative Stars ───────────────────────────
           _buildStar(top: 80, left: 30, size: 24, color: AppColors.ink),
           _buildStar(top: 120, right: 50, size: 16, color: AppColors.comicRed),
           _buildStar(bottom: 160, left: 60, size: 20, color: AppColors.accent),
           _buildStar(bottom: 200, right: 40, size: 28, color: AppColors.ink),
 
-          // ── Main Content ───────────────────────────────
           SafeArea(
             child: Center(
               child: AnimatedBuilder(
@@ -159,7 +158,6 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // ── Logo Panel (Comic Style) ───────────
                     AnimatedBuilder(
                       animation: _floatController,
                       builder: (ctx, child) => Transform.translate(
@@ -174,7 +172,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                     const SizedBox(height: 28),
 
-                    // ── App Title ────────────────────────
                     _buildComicTitle(),
 
                     const SizedBox(height: 8),
@@ -183,7 +180,6 @@ class _SplashScreenState extends State<SplashScreen>
                     _buildOwnerBadge(),
                     const SizedBox(height: 40),
 
-                    // ── Loading dots ─────────────────────
                     _buildLoadingDots(),
                   ],
                 ),
@@ -237,19 +233,11 @@ class _SplashScreenState extends State<SplashScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.ink, width: 4),
         boxShadow: const [
-          BoxShadow(
-            color: AppColors.ink,
-            offset: Offset(6, 6),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
         ],
       ),
       child: const Center(
-        child: Icon(
-          Icons.storefront_rounded,
-          color: AppColors.ink,
-          size: 60,
-        ),
+        child: Icon(Icons.storefront_rounded, color: AppColors.ink, size: 60),
       ),
     );
   }
@@ -257,7 +245,6 @@ class _SplashScreenState extends State<SplashScreen>
   Widget _buildComicTitle() {
     return Column(
       children: [
-        // Yellow highlight band behind title
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           decoration: BoxDecoration(
@@ -293,11 +280,7 @@ class _SplashScreenState extends State<SplashScreen>
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.ink, width: 2),
         boxShadow: const [
-          BoxShadow(
-            color: AppColors.ink,
-            offset: Offset(2, 2),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: AppColors.ink, offset: Offset(2, 2), blurRadius: 0),
         ],
       ),
       child: Text(
@@ -320,11 +303,7 @@ class _SplashScreenState extends State<SplashScreen>
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.ink, width: 2),
         boxShadow: const [
-          BoxShadow(
-            color: AppColors.ink,
-            offset: Offset(3, 3),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: AppColors.ink, offset: Offset(3, 3), blurRadius: 0),
         ],
       ),
       child: Row(
@@ -374,7 +353,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-/// Custom Painter untuk Halftone Dot Pattern
 class _HalftonePatternPainter extends CustomPainter {
   final Color dotColor;
   final double spacing;

@@ -1,36 +1,11 @@
-/// Model data produk dari API praktikum
-///
-/// Response GET /api/products:
-/// ```json
-/// {
-///   "success": true,
-///   "message": "Draft products retrieved successfully.",
-///   "products": [
-///     {
-///       "id": 2,
-///       "name": "Macbook Pro M5 2026 - Silver",
-///       "price": "32450000.00",
-///       "description": "The MacBook Pro M5 2026...",
-///       "created_at": "2026-05-08 07:40:15",
-///       "updated_at": "2026-05-08 07:40:15",
-///       "user": {
-///         "id": 398,
-///         "name": "DIAN EKA RAHAYU",
-///         "username": "232410182006"
-///       },
-///       "class": { "id": 3, "name": "TI-A" }
-///     }
-///   ]
-/// }
-/// ```
 class ProductModel {
   final int id;
   final String name;
   final double price;
   final String description;
-  final String? userId;       // username (NIM) pemilik produk
-  final String? ownerName;    // nama lengkap pemilik produk
-  final String? ownerClass;   // kelas pemilik produk
+  final String? userId; // username (NIM) pemilik produk
+  final String? ownerName; // nama lengkap pemilik produk
+  final String? ownerClass; // kelas pemilik produk
   final bool isDeleted;
   final DateTime? createdAt;
 
@@ -46,29 +21,22 @@ class ProductModel {
     this.createdAt,
   });
 
-  /// Buat ProductModel dari JSON response API
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    // ── Parsing user info dari nested object ─────────────
     String? userId;
     String? ownerName;
     final userObj = json['user'] as Map<String, dynamic>?;
     if (userObj != null) {
-      // username = NIM mahasiswa
       userId = userObj['username']?.toString();
-      // nama lengkap pemilik
       ownerName = userObj['name']?.toString();
     }
-    // Fallback jika tidak ada nested user
     userId ??= json['user_id']?.toString();
 
-    // ── Parsing class info ───────────────────────────
     String? ownerClass;
     final classObj = json['class'] as Map<String, dynamic>?;
     if (classObj != null) {
       ownerClass = classObj['name']?.toString();
     }
 
-    // ── Parsing harga (API bisa kirim string "32450000.00" atau int) ──
     double price = 0.0;
     final priceRaw = json['price'];
     if (priceRaw is num) {
@@ -85,7 +53,6 @@ class ProductModel {
       userId: userId,
       ownerName: ownerName,
       ownerClass: ownerClass,
-      // Soft delete: ada field deleted_at yang tidak null
       isDeleted: json['deleted_at'] != null,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
@@ -93,7 +60,6 @@ class ProductModel {
     );
   }
 
-  /// Konversi ke JSON untuk request POST /api/products
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -102,7 +68,6 @@ class ProductModel {
     };
   }
 
-  /// Buat salinan dengan field yang diubah
   ProductModel copyWith({
     int? id,
     String? name,

@@ -48,11 +48,14 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    _fadeAnim = CurvedAnimation(parent: _entryController, curve: Curves.easeOut);
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.25),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic));
+    _fadeAnim = CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeOut,
+    );
+    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic),
+        );
     _bounceAnim = Tween<double>(begin: -6.0, end: 6.0).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
@@ -109,7 +112,12 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             const Icon(Icons.warning_rounded, color: Colors.white, size: 18),
             const SizedBox(width: 8),
-            Expanded(child: Text(message, style: GoogleFonts.nunito(fontWeight: FontWeight.w600))),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.nunito(fontWeight: FontWeight.w600),
+              ),
+            ),
           ],
         ),
         backgroundColor: AppColors.comicRed,
@@ -127,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen>
         message: AppStrings.loginLoading,
         child: Stack(
           children: [
-            // ── Halftone Background ─────────────────────
             Positioned.fill(
               child: CustomPaint(
                 painter: _DotPatternPainter(
@@ -138,8 +145,9 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
 
-            // ── Decorations ────────────────────────────
-            Positioned(top: 60, right: 20,
+            Positioned(
+              top: 60,
+              right: 20,
               child: AnimatedBuilder(
                 animation: _bounceController,
                 builder: (context, _) => Transform.translate(
@@ -148,7 +156,9 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ),
             ),
-            Positioned(top: 140, left: 16,
+            Positioned(
+              top: 140,
+              left: 16,
               child: AnimatedBuilder(
                 animation: _bounceController,
                 builder: (context, _) => Transform.translate(
@@ -157,7 +167,9 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ),
             ),
-            Positioned(bottom: 100, right: 24,
+            Positioned(
+              bottom: 100,
+              right: 24,
               child: AnimatedBuilder(
                 animation: _bounceController,
                 builder: (context, _) => Transform.translate(
@@ -167,22 +179,21 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
 
-            // ── Main Content ───────────────────────────
             SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height
-                        - MediaQuery.of(context).padding.top
-                        - MediaQuery.of(context).padding.bottom,
+                    minHeight:
+                        MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        MediaQuery.of(context).padding.bottom,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 60),
 
-                      // ── Hero Section ─────────────────
                       FadeTransition(
                         opacity: _fadeAnim,
                         child: SlideTransition(
@@ -193,7 +204,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                       const SizedBox(height: 28),
 
-                      // ── Login Card ────────────────────
                       FadeTransition(
                         opacity: _fadeAnim,
                         child: SlideTransition(
@@ -219,7 +229,6 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildHeroSection() {
     return Column(
       children: [
-        // Floating logo
         AnimatedBuilder(
           animation: _bounceController,
           builder: (_, child) => Transform.translate(
@@ -234,18 +243,25 @@ class _LoginScreenState extends State<LoginScreen>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.ink, width: 4),
               boxShadow: const [
-                BoxShadow(color: AppColors.ink, offset: Offset(8, 8), blurRadius: 0),
+                BoxShadow(
+                  color: AppColors.ink,
+                  offset: Offset(8, 8),
+                  blurRadius: 0,
+                ),
               ],
             ),
             child: const Center(
-              child: Icon(Icons.storefront_rounded, color: AppColors.ink, size: 52),
+              child: Icon(
+                Icons.storefront_rounded,
+                color: AppColors.ink,
+                size: 52,
+              ),
             ),
           ),
         ),
 
         const SizedBox(height: 20),
 
-        // Title panel
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
           decoration: BoxDecoration(
@@ -253,7 +269,11 @@ class _LoginScreenState extends State<LoginScreen>
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: AppColors.ink, width: 3),
             boxShadow: const [
-              BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.ink,
+                offset: Offset(6, 6),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: Text(
@@ -268,7 +288,6 @@ class _LoginScreenState extends State<LoginScreen>
 
         const SizedBox(height: 8),
 
-        // Speech bubble subtitle
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
@@ -276,7 +295,11 @@ class _LoginScreenState extends State<LoginScreen>
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: AppColors.ink, width: 2.5),
             boxShadow: const [
-              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.ink,
+                offset: Offset(4, 4),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: Text(
@@ -305,13 +328,14 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Card Header ─────────────────────────────
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             decoration: const BoxDecoration(
               color: AppColors.accent,
               borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: AppColors.ink, width: 2.5)),
+              border: Border(
+                bottom: BorderSide(color: AppColors.ink, width: 2.5),
+              ),
             ),
             child: Row(
               children: [
@@ -330,7 +354,6 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
 
-          // ── Form ─────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(20),
             child: Form(
@@ -338,7 +361,6 @@ class _LoginScreenState extends State<LoginScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // NIM Field
                   _buildComicLabel('USERNAME (NIM)', Icons.badge_outlined),
                   const SizedBox(height: 6),
                   _buildComicTextField(
@@ -353,8 +375,10 @@ class _LoginScreenState extends State<LoginScreen>
 
                   const SizedBox(height: 18),
 
-                  // Password Field
-                  _buildComicLabel('PASSWORD (NIM)', Icons.lock_outline_rounded),
+                  _buildComicLabel(
+                    'PASSWORD (NIM)',
+                    Icons.lock_outline_rounded,
+                  ),
                   const SizedBox(height: 6),
                   _buildComicTextField(
                     controller: _passwordController,
@@ -379,7 +403,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                   const SizedBox(height: 24),
 
-                  // Login Button
                   _buildComicButton(),
                 ],
               ),
@@ -432,49 +455,59 @@ class _LoginScreenState extends State<LoginScreen>
         focusNode: focusNode,
         obscureText: obscure,
         keyboardType: keyboardType,
-        textInputAction: nextFocus != null ? TextInputAction.next : TextInputAction.done,
+        textInputAction: nextFocus != null
+            ? TextInputAction.next
+            : TextInputAction.done,
         style: GoogleFonts.spaceGrotesk(
           fontWeight: FontWeight.w600,
           fontSize: 15,
           color: AppColors.textPrimary,
         ),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: GoogleFonts.nunito(
-          fontSize: 14,
-          color: AppColors.textHint,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GoogleFonts.nunito(
+            fontSize: 14,
+            color: AppColors.textHint,
+          ),
+          prefixIcon: Icon(
+            prefixIcon,
+            color: AppColors.textSecondary,
+            size: 20,
+          ),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: AppColors.backgroundAlt,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.border, width: 2.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.border, width: 2.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.comicRed, width: 3),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.error, width: 2.5),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.error, width: 3),
+          ),
         ),
-        prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary, size: 20),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: AppColors.backgroundAlt,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.border, width: 2.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.border, width: 2.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.comicRed, width: 3),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.error, width: 2.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.error, width: 3),
-        ),
+        onFieldSubmitted: nextFocus != null
+            ? (_) => FocusScope.of(context).requestFocus(nextFocus)
+            : (_) => onSubmit?.call(),
+        validator: validator,
       ),
-      onFieldSubmitted: nextFocus != null
-          ? (_) => FocusScope.of(context).requestFocus(nextFocus)
-          : (_) => onSubmit?.call(),
-      validator: validator,
-    ));
+    );
   }
 
   Widget _buildComicButton() {
@@ -489,7 +522,11 @@ class _LoginScreenState extends State<LoginScreen>
           boxShadow: _isLoading
               ? []
               : const [
-                  BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.ink,
+                    offset: Offset(6, 6),
+                    blurRadius: 0,
+                  ),
                 ],
         ),
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -507,7 +544,11 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               const SizedBox(width: 10),
             ] else ...[
-              const Icon(Icons.rocket_launch_rounded, color: AppColors.ink, size: 20),
+              const Icon(
+                Icons.rocket_launch_rounded,
+                color: AppColors.ink,
+                size: 20,
+              ),
               const SizedBox(width: 8),
             ],
             Text(
@@ -545,8 +586,11 @@ class _LoginScreenState extends State<LoginScreen>
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: AppColors.ink, width: 1.5),
             ),
-            child: const Icon(Icons.info_outline_rounded,
-                size: 14, color: AppColors.ink),
+            child: const Icon(
+              Icons.info_outline_rounded,
+              size: 14,
+              color: AppColors.ink,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 
-/// TextField yang sudah distyle sesuai design system aplikasi
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String label;
@@ -63,23 +62,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
       enabled: widget.enabled,
       autofocus: widget.autofocus,
       textInputAction: widget.textInputAction,
-      style: AppTextStyles.bodyMedium.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,
         prefixIcon: widget.prefixIcon != null
-            ? Icon(
-                widget.prefixIcon,
-                color: AppColors.textSecondary,
-                size: 20,
-              )
+            ? Icon(widget.prefixIcon, color: AppColors.textSecondary, size: 20)
             : null,
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  _obscure
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
                   color: AppColors.textSecondary,
                   size: 20,
                 ),
