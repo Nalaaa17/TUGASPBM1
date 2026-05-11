@@ -5,14 +5,14 @@ import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../data/models/product_model.dart';
 
-// Daftar warna header kartu (bergilir berdasarkan index)
-const List<List<Color>> _cardGradients = [
-  [Color(0xFF1E88E5), Color(0xFF42A5F5)],
-  [Color(0xFF6C63FF), Color(0xFF9C8FFF)],
-  [Color(0xFF00BFA5), Color(0xFF1DE9B6)],
-  [Color(0xFFFF6B35), Color(0xFFFF9A76)],
-  [Color(0xFF673AB7), Color(0xFF9575CD)],
-  [Color(0xFF00838F), Color(0xFF26C6DA)],
+// Daftar warna solid kartu ala Comic Panel (bergilir berdasarkan index)
+const List<Color> _cardColors = [
+  AppColors.panelBlue,
+  AppColors.panelPink,
+  AppColors.panelGreen,
+  AppColors.panelPurple,
+  Color(0xFFFF9100), // Orange tebal
+  Color(0xFF00E5FF), // Cyan terang
 ];
 
 /// Ambil inisial dari nama produk
@@ -47,8 +47,8 @@ class ProductCard extends StatelessWidget {
     return formatter.format(product.price);
   }
 
-  List<Color> get _gradient =>
-      _cardGradients[index % _cardGradients.length];
+  Color get _cardColor =>
+      _cardColors[index % _cardColors.length];
 
   void _confirmDelete(BuildContext context) {
     showDialog(
@@ -99,26 +99,32 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildGridCard(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 3,
-      shadowColor: Color(_gradient[0].toARGB32()).withValues(alpha: 0.25),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: InkWell(
-        onTap: () => _showDetailSheet(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header Gradient ───────────────────────────
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _gradient,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6, right: 6),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.ink, width: 3),
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(9),
+          onTap: () => _showDetailSheet(context),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header Panel ───────────────────────────
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: _cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+                  border: const Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
                 ),
-              ),
               child: Stack(
                 children: [
                   // Inisial produk
@@ -272,14 +278,13 @@ class ProductCard extends StatelessWidget {
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
-                              color: Color(_gradient[0].toARGB32())
-                                  .withValues(alpha: 0.1),
+                              color: _cardColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 12,
-                              color: _gradient[0],
+                              color: _cardColor,
                             ),
                           ),
                         ),
@@ -292,19 +297,27 @@ class ProductCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 
   Widget _buildListCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      shadowColor: Color(_gradient[0].toARGB32()).withValues(alpha: 0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () => _showDetailSheet(context),
-        child: Padding(
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 5, 20, 11),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.ink, width: 3),
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(9),
+          onTap: () => _showDetailSheet(context),
+          child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
@@ -313,12 +326,9 @@ class ProductCard extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: _gradient,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
+                  color: _cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.ink, width: 2),
                 ),
                 child: Center(
                   child: Text(
@@ -419,7 +429,7 @@ class ProductCard extends StatelessWidget {
                   IconButton(
                     onPressed: () => _showDetailSheet(context),
                     icon: Icon(Icons.info_outline_rounded,
-                        color: _gradient[0], size: 20),
+                        color: _cardColor, size: 20),
                     tooltip: 'Detail',
                     constraints: const BoxConstraints(
                         minWidth: 36, minHeight: 36),
@@ -439,6 +449,7 @@ class ProductCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -480,12 +491,12 @@ class ProductCard extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: _gradient,
-                  ),
+                  color: _cardColor,
                   borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.ink, width: 3),
+                  boxShadow: const [
+                    BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -550,6 +561,18 @@ class ProductCard extends StatelessWidget {
                     _detailRow(Icons.payments_outlined,
                         'Harga', _formattedPrice),
                     const SizedBox(height: 12),
+                    if (product.userId != null)
+                      _detailRow(Icons.badge_outlined,
+                          'NIM Pemilik', product.userId!),
+                    if (product.userId != null) const SizedBox(height: 12),
+                    if (product.ownerName != null)
+                      _detailRow(Icons.person_outline_rounded,
+                          'Nama Pemilik', product.ownerName!),
+                    if (product.ownerName != null) const SizedBox(height: 12),
+                    if (product.ownerClass != null)
+                      _detailRow(Icons.class_outlined,
+                          'Kelas', product.ownerClass!),
+                    if (product.ownerClass != null) const SizedBox(height: 12),
                     if (product.createdAt != null)
                       _detailRow(Icons.schedule_rounded, 'Dibuat pada',
                           _fullDate(product.createdAt!)),
@@ -664,11 +687,16 @@ class _ProductCardShimmerState extends State<ProductCardShimmer>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18)),
-          elevation: 2,
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6, right: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: const [
+              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -676,7 +704,11 @@ class _ProductCardShimmerState extends State<ProductCardShimmer>
                 opacity: _animation.value,
                 child: Container(
                   height: 100,
-                  color: AppColors.shimmerBase,
+                  decoration: const BoxDecoration(
+                    color: AppColors.shimmerBase,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
+                    border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+                  ),
                   child: Center(
                     child: Container(
                       width: 42,

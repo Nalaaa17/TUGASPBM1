@@ -32,13 +32,17 @@ class EmptyState extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.5),
-                shape: BoxShape.circle,
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.ink, width: 3),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
+                ],
               ),
               child: Icon(
                 icon,
                 size: 48,
-                color: AppColors.primaryLight,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(height: 24),
@@ -63,12 +67,34 @@ class EmptyState extends StatelessWidget {
             // Action button
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 28),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: onAction,
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(actionLabel!),
+              GestureDetector(
+                onTap: onAction,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.ink, width: 3),
+                    boxShadow: const [
+                      BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.add_rounded, size: 20, color: AppColors.ink),
+                      const SizedBox(width: 8),
+                      Text(
+                        actionLabel!.toUpperCase(),
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.ink,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

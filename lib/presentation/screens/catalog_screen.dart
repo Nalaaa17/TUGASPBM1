@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -13,6 +14,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/loading_overlay.dart';
 import 'add_product_screen.dart';
 import 'login_screen.dart';
+import 'submit_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -69,8 +71,18 @@ class _CatalogScreenState extends State<CatalogScreen>
       final products = await AuthService.getMyProducts();
       if (!mounted) return;
       setState(() {
-        _products = products;
-        _filtered = List.from(products);
+        _products = products.where((p) => !p.isDeleted).toList();
+        
+        // Re-apply search filter if it exists
+        final q = _searchCtrl.text.trim().toLowerCase();
+        _filtered = q.isEmpty
+            ? List.from(_products)
+            : _products
+                .where((p) =>
+                    p.name.toLowerCase().contains(q) ||
+                    p.description.toLowerCase().contains(q))
+                .toList();
+                
         _isLoading = false;
       });
     } on ApiException catch (e) {
@@ -140,7 +152,23 @@ class _CatalogScreenState extends State<CatalogScreen>
     final added = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => const AddProductScreen()),
     );
-    if (added == true) _loadProducts();
+    if (added == true) {
+      // Clear search to ensure new product is visible
+      _searchCtrl.clear();
+      setState(() {
+        _showSearch = false;
+      });
+      _loadProducts();
+    }
+  }
+
+  Future<void> _navigateToSubmit() async {
+    final submitted = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const SubmitScreen()),
+    );
+    if (submitted == true) {
+      _loadProducts();
+    }
   }
 
 
@@ -221,7 +249,7 @@ class _CatalogScreenState extends State<CatalogScreen>
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             // ── SliverAppBar ────────────────────────────
             SliverAppBar(
-              expandedHeight: 180,
+              expandedHeight: 200,
               floating: false,
               pinned: true,
               snap: false,
@@ -237,11 +265,16 @@ class _CatalogScreenState extends State<CatalogScreen>
                 child: Text(
                   AppStrings.catalogTitle,
                   style: AppTextStyles.headingSmall.copyWith(
-                    color: Colors.white,
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
               actions: _buildActions(),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(3),
+                child: Container(height: 3, color: AppColors.ink),
+              ),
             ),
 
             // ── Stats Header ────────────────────────────
@@ -263,20 +296,38 @@ class _CatalogScreenState extends State<CatalogScreen>
           ],
           body: RefreshIndicator(
             color: AppColors.primary,
+            backgroundColor: AppColors.ink,
             onRefresh: _loadProducts,
             child: _buildBody(useGrid),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToAddProduct,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Tambah Draft'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+      floatingActionButton: GestureDetector(
+        onTap: _navigateToAddProduct,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.ink, width: 2.5),
+            boxShadow: const [
+              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.add_rounded, color: AppColors.ink, size: 22),
+              const SizedBox(width: 8),
+              Text(
+                'TAMBAH DRAFT',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 13, fontWeight: FontWeight.w800,
+                  color: AppColors.ink, letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -317,9 +368,22 @@ class _CatalogScreenState extends State<CatalogScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         onSelected: (value) {
           if (value == 'refresh') _loadProducts();
+          if (value == 'submit') _navigateToSubmit();
           if (value == 'logout') _logout();
         },
         itemBuilder: (ctx) => [
+          const PopupMenuItem(
+            value: 'submit',
+            child: Row(
+              children: [
+                Icon(Icons.send_rounded, size: 18, color: AppColors.success),
+                SizedBox(width: 10),
+                Text(AppStrings.submitTitle,
+                    style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const PopupMenuDivider(),
           const PopupMenuItem(
             value: 'refresh',
             child: Row(
@@ -348,215 +412,229 @@ class _CatalogScreenState extends State<CatalogScreen>
 
   Widget _buildAppBarBackground(String displayName, String nim) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1565C0), Color(0xFF2196F3), Color(0xFF42A5F5)],
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 56, 20, 16),
-          child: Row(
-            children: [
-              // Avatar
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.4), width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    displayName.isNotEmpty
-                        ? displayName[0].toUpperCase()
-                        : 'M',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+      color: AppColors.primary,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _ComicDotPainter(
+                color: AppColors.ink.withValues(alpha: 0.07),
+                spacing: 20,
+                radius: 2.5,
               ),
-              const SizedBox(width: 14),
-
-              // Info user
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Halo, $displayName 👋',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+              child: Row(
+                children: [
+                  // Avatar Box
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.ink, width: 3),
+                      boxShadow: const [
+                        BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+                      ],
                     ),
-                    const SizedBox(height: 3),
-                    if (nim.isNotEmpty)
-                      Text(
-                        'NIM: $nim',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 12,
+                    child: Center(
+                      child: Text(
+                        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                        style: GoogleFonts.bangers(
+                          fontSize: 36,
+                          color: AppColors.ink,
+                          letterSpacing: 1,
                         ),
                       ),
-                    const SizedBox(height: 6),
-                    // Badge produk milik sendiri
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.lock_outline_rounded,
-                              color: Colors.white, size: 11),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Katalog Pribadi — Hanya kamu yang bisa melihat',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.95),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.comicRed,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                              bottomLeft: Radius.circular(0),
+                            ),
+                            border: Border.all(color: AppColors.ink, width: 2.5),
+                            boxShadow: const [
+                              BoxShadow(color: AppColors.ink, offset: Offset(2, 2), blurRadius: 0),
+                            ],
+                          ),
+                          child: Text(
+                            'HALO! 👋',
+                            style: GoogleFonts.bangers(
+                              fontSize: 14, color: Colors.white, letterSpacing: 1.5,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          displayName.isNotEmpty ? displayName : 'Mahasiswa',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.ink,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (nim.isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.ink, width: 1.5),
+                            ),
+                            child: Text(
+                              'NIM: $nim',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.ink,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildStatsRow() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
       child: Row(
         children: [
-          // Total produk
-          Expanded(
-            child: _statItem(
-              icon: Icons.inventory_2_rounded,
-              label: 'Total Draft',
-              value: '${_products.length}',
-              color: AppColors.primary,
-            ),
+          _statCard(
+            icon: Icons.inventory_2_rounded,
+            label: 'DRAFT',
+            value: '${_products.length}',
+            bgColor: AppColors.accent,
           ),
-          Container(
-            width: 1,
-            height: 40,
-            color: AppColors.divider,
+          const SizedBox(width: 10),
+          _statCard(
+            icon: Icons.account_balance_wallet_rounded,
+            label: 'TOTAL NILAI',
+            value: _products.isEmpty ? 'Rp 0' : _formattedTotal,
+            bgColor: AppColors.comicRed,
+            textColor: Colors.white,
           ),
-          // Total nilai
-          Expanded(
-            child: _statItem(
-              icon: Icons.account_balance_wallet_rounded,
-              label: 'Total Nilai',
-              value: _products.isEmpty ? 'Rp 0' : _formattedTotal,
-              color: AppColors.accentDark,
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 40,
-            color: AppColors.divider,
-          ),
-          // Hasil pencarian
-          Expanded(
-            child: _statItem(
-              icon: Icons.filter_list_rounded,
-              label: 'Tampil',
-              value: '${_filtered.length}',
-              color: AppColors.success,
-            ),
+          const SizedBox(width: 10),
+          _statCard(
+            icon: Icons.filter_list_rounded,
+            label: 'TAMPIL',
+            value: '${_filtered.length}',
+            bgColor: AppColors.success,
+            textColor: Colors.white,
           ),
         ],
       ),
     );
   }
 
-  Widget _statItem({
+  Widget _statCard({
     required IconData icon,
     required String label,
     required String value,
-    required Color color,
+    required Color bgColor,
+    Color textColor = AppColors.ink,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: AppTextStyles.headingSmall.copyWith(
-            color: color,
-            fontSize: 14,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.ink, width: 2.5),
+          boxShadow: const [
+            BoxShadow(color: AppColors.ink, offset: Offset(3, 3), blurRadius: 0),
+          ],
         ),
-        Text(label, style: AppTextStyles.caption),
-      ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: textColor, size: 18),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: textColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              label,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                color: textColor.withValues(alpha: 0.7),
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: TextField(
-        controller: _searchCtrl,
-        autofocus: true,
-        style: AppTextStyles.bodyMedium,
-        decoration: InputDecoration(
-          hintText: 'Cari nama atau deskripsi produk...',
-          prefixIcon: const Icon(Icons.search_rounded,
-              color: AppColors.primary, size: 20),
-          suffixIcon: _searchCtrl.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear_rounded,
-                      size: 18, color: AppColors.textSecondary),
-                  onPressed: () {
-                    _searchCtrl.clear();
-                    setState(() => _filtered = List.from(_products));
-                  },
-                )
-              : null,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          filled: true,
-          fillColor: AppColors.surface,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.ink, width: 3),
+          boxShadow: const [
+            BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+          ],
+        ),
+        child: TextField(
+          controller: _searchCtrl,
+          autofocus: true,
+          style: AppTextStyles.bodyMedium,
+          decoration: InputDecoration(
+            hintText: 'Cari nama atau deskripsi produk...',
+            prefixIcon: const Icon(Icons.search_rounded,
+                color: AppColors.primary, size: 20),
+            suffixIcon: _searchCtrl.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear_rounded,
+                        size: 18, color: AppColors.textSecondary),
+                    onPressed: () {
+                      _searchCtrl.clear();
+                      setState(() => _filtered = List.from(_products));
+                    },
+                  )
+                : null,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: InputBorder.none,
+          ),
         ),
       ),
     );
@@ -582,9 +660,12 @@ class _CatalogScreenState extends State<CatalogScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.divider),
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.ink, width: 2),
+              boxShadow: const [
+                BoxShadow(color: AppColors.ink, offset: Offset(2, 2), blurRadius: 0),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -609,15 +690,9 @@ class _CatalogScreenState extends State<CatalogScreen>
 
   Widget _buildBottomNav() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 12,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppColors.ink, width: 3)),
       ),
       child: SafeArea(
         child: Padding(
@@ -652,8 +727,12 @@ class _CatalogScreenState extends State<CatalogScreen>
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: AppColors.accent,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.ink, width: 2.5),
+                  boxShadow: const [
+                    BoxShadow(color: AppColors.ink, offset: Offset(3, 3), blurRadius: 0),
+                  ],
                 ),
                 child: Text(
                   '${_products.length} Draft',
@@ -892,4 +971,30 @@ class _ListShimmerItemState extends State<_ListShimmerItem>
       ),
     );
   }
+}
+
+/// CustomPainter — Halftone dot pattern background untuk nuansa komik
+class _ComicDotPainter extends CustomPainter {
+  final Color color;
+  final double spacing;
+  final double radius;
+
+  const _ComicDotPainter({
+    required this.color,
+    required this.spacing,
+    required this.radius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

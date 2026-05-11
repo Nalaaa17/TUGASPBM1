@@ -112,5 +112,21 @@ class AuthService {
     await ApiService.delete('$_productsEndpoint/$productId');
   }
 
+  /// Submit Tugas Akhir
+  ///
+  /// POST /api/products/submit
+  static Future<void> submitTugas({
+    required String name,
+    required double price,
+    required String description,
+    required String githubUrl,
+  }) async {
+    await ApiService.post('$_productsEndpoint/submit', {
+      'name': name,
+      'price': price.toInt(),
+      'description': description,
+      'github_url': githubUrl,
+    });
+  }
 }
 

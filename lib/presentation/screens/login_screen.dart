@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../data/services/api_service.dart';
-import '../widgets/custom_text_field.dart';
 import '../widgets/loading_overlay.dart';
 import 'catalog_screen.dart';
 
@@ -28,39 +28,37 @@ class _LoginScreenState extends State<LoginScreen>
   final _passwordFocus = FocusNode();
 
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  late AnimationController _entryController;
+  late AnimationController _bounceController;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+  late Animation<double> _bounceAnim;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _slideController = AnimationController(
+    _entryController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
 
-    // Mulai animasi saat screen terbuka
+    _fadeAnim = CurvedAnimation(parent: _entryController, curve: Curves.easeOut);
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.25),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic));
+    _bounceAnim = Tween<double>(begin: -6.0, end: 6.0).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
+    );
+
     Future.delayed(const Duration(milliseconds: 100), () {
-      _fadeController.forward();
-      _slideController.forward();
+      _entryController.forward();
     });
   }
 
@@ -70,14 +68,13 @@ class _LoginScreenState extends State<LoginScreen>
     _passwordController.dispose();
     _nimFocus.dispose();
     _passwordFocus.dispose();
-    _fadeController.dispose();
-    _slideController.dispose();
+    _entryController.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
     try {
       final auth = context.read<AuthProvider>();
@@ -85,15 +82,12 @@ class _LoginScreenState extends State<LoginScreen>
         _nimController.text.trim(),
         _passwordController.text.trim(),
       );
-
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (ctx, anim, _) => const CatalogScreen(),
-          transitionsBuilder: (ctx, anim, _, child) => FadeTransition(
-            opacity: anim,
-            child: child,
-          ),
+          transitionsBuilder: (ctx, anim, _, child) =>
+              FadeTransition(opacity: anim, child: child),
           transitionDuration: const Duration(milliseconds: 400),
         ),
       );
@@ -113,12 +107,12 @@ class _LoginScreenState extends State<LoginScreen>
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 18),
+            const Icon(Icons.warning_rounded, color: Colors.white, size: 18),
             const SizedBox(width: 8),
-            Expanded(child: Text(message)),
+            Expanded(child: Text(message, style: GoogleFonts.nunito(fontWeight: FontWeight.w600))),
           ],
         ),
-        backgroundColor: AppColors.error,
+        backgroundColor: AppColors.comicRed,
         duration: const Duration(seconds: 4),
       ),
     );
@@ -127,198 +121,473 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primary,
       body: LoadingOverlay(
         isLoading: _isLoading,
         message: AppStrings.loginLoading,
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient,
-          ),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.top -
-                      MediaQuery.of(context).padding.bottom,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 60),
-
-                    // ── Logo & Header ───────────────────────
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        children: [
-                          // Logo icon
-                          Container(
-                            width: 88,
-                            height: 88,
-                            decoration: BoxDecoration(
-                              gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.storefront_rounded,
-                              color: Colors.white,
-                              size: 44,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            AppStrings.loginWelcome,
-                            style: AppTextStyles.displayMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppStrings.loginSubtitle,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // ── Form Card ────────────────────────────
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Container(
-                          padding: const EdgeInsets.all(28),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.cardShadow,
-                                blurRadius: 24,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // NIM field
-                                CustomTextField(
-                                  controller: _nimController,
-                                  focusNode: _nimFocus,
-                                  label: AppStrings.labelNim,
-                                  hint: AppStrings.hintNim,
-                                  prefixIcon: Icons.badge_outlined,
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                  validator: Validators.nim,
-                                  onFieldSubmitted: (_) {
-                                    FocusScope.of(context)
-                                        .requestFocus(_passwordFocus);
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-
-                                // Password field
-                                CustomTextField(
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocus,
-                                  label: AppStrings.labelPassword,
-                                  hint: AppStrings.hintPassword,
-                                  prefixIcon: Icons.lock_outline,
-                                  obscureText: true,
-                                  textInputAction: TextInputAction.done,
-                                  validator: Validators.password,
-                                  onFieldSubmitted: (_) => _login(),
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Info NIM hint
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryContainer
-                                        .withValues(alpha: 0.4),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.info_outline,
-                                        size: 14,
-                                        color: AppColors.primaryDark,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Expanded(
-                                        child: Text(
-                                          'Username = NIM kamu  |  Password = NIM kamu',
-                                          style: AppTextStyles.caption.copyWith(
-                                            color: AppColors.primaryDark,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Login button
-                                ElevatedButton(
-                                  onPressed: _isLoading ? null : _login,
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppStrings.btnLogin,
-                                    style: AppTextStyles.buttonText,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // Footer
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Text(
-                        AppStrings.appSubtitle,
-                        style: AppTextStyles.caption,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+        child: Stack(
+          children: [
+            // ── Halftone Background ─────────────────────
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _DotPatternPainter(
+                  color: AppColors.ink.withValues(alpha: 0.07),
+                  spacing: 20,
+                  radius: 2.5,
                 ),
               ),
             ),
-          ),
+
+            // ── Decorations ────────────────────────────
+            Positioned(top: 60, right: 20,
+              child: AnimatedBuilder(
+                animation: _bounceController,
+                builder: (context, _) => Transform.translate(
+                  offset: Offset(0, _bounceAnim.value),
+                  child: _comicStar(size: 32, color: AppColors.comicRed),
+                ),
+              ),
+            ),
+            Positioned(top: 140, left: 16,
+              child: AnimatedBuilder(
+                animation: _bounceController,
+                builder: (context, _) => Transform.translate(
+                  offset: Offset(0, -_bounceAnim.value),
+                  child: _comicStar(size: 22, color: AppColors.ink),
+                ),
+              ),
+            ),
+            Positioned(bottom: 100, right: 24,
+              child: AnimatedBuilder(
+                animation: _bounceController,
+                builder: (context, _) => Transform.translate(
+                  offset: Offset(0, _bounceAnim.value * 0.7),
+                  child: _comicStar(size: 20, color: AppColors.accent),
+                ),
+              ),
+            ),
+
+            // ── Main Content ───────────────────────────
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height
+                        - MediaQuery.of(context).padding.top
+                        - MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 60),
+
+                      // ── Hero Section ─────────────────
+                      FadeTransition(
+                        opacity: _fadeAnim,
+                        child: SlideTransition(
+                          position: _slideAnim,
+                          child: _buildHeroSection(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // ── Login Card ────────────────────
+                      FadeTransition(
+                        opacity: _fadeAnim,
+                        child: SlideTransition(
+                          position: _slideAnim,
+                          child: _buildLoginCard(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+                      _buildInfoNote(),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget _buildHeroSection() {
+    return Column(
+      children: [
+        // Floating logo
+        AnimatedBuilder(
+          animation: _bounceController,
+          builder: (_, child) => Transform.translate(
+            offset: Offset(0, _bounceAnim.value * 0.5),
+            child: child,
+          ),
+          child: Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.ink, width: 4),
+              boxShadow: const [
+                BoxShadow(color: AppColors.ink, offset: Offset(8, 8), blurRadius: 0),
+              ],
+            ),
+            child: const Center(
+              child: Icon(Icons.storefront_rounded, color: AppColors.ink, size: 52),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Title panel
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.comicRed,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: const [
+              BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
+            ],
+          ),
+          child: Text(
+            AppStrings.loginWelcome.toUpperCase().replaceAll('!', ''),
+            style: GoogleFonts.bangers(
+              fontSize: 28,
+              color: Colors.white,
+              letterSpacing: 2.5,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Speech bubble subtitle
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.ink, width: 2.5),
+            boxShadow: const [
+              BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+            ],
+          ),
+          child: Text(
+            AppStrings.loginSubtitle,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.ink, width: 3),
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(8, 8), blurRadius: 0),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Card Header ─────────────────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            decoration: const BoxDecoration(
+              color: AppColors.accent,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              border: Border(bottom: BorderSide(color: AppColors.ink, width: 2.5)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.login_rounded, color: AppColors.ink, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'MASUK KE AKUN',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Form ─────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // NIM Field
+                  _buildComicLabel('USERNAME (NIM)', Icons.badge_outlined),
+                  const SizedBox(height: 6),
+                  _buildComicTextField(
+                    controller: _nimController,
+                    focusNode: _nimFocus,
+                    hint: AppStrings.hintNim,
+                    prefixIcon: Icons.person_outline_rounded,
+                    keyboardType: TextInputType.number,
+                    nextFocus: _passwordFocus,
+                    validator: Validators.nim,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Password Field
+                  _buildComicLabel('PASSWORD (NIM)', Icons.lock_outline_rounded),
+                  const SizedBox(height: 6),
+                  _buildComicTextField(
+                    controller: _passwordController,
+                    focusNode: _passwordFocus,
+                    hint: AppStrings.hintPassword,
+                    prefixIcon: Icons.lock_outline_rounded,
+                    obscure: _obscurePassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                    validator: Validators.password,
+                    onSubmit: _login,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Login Button
+                  _buildComicButton(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComicLabel(String text, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: AppColors.ink),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: AppColors.ink,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComicTextField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String hint,
+    required IconData prefixIcon,
+    bool obscure = false,
+    Widget? suffixIcon,
+    TextInputType keyboardType = TextInputType.text,
+    FocusNode? nextFocus,
+    String? Function(String?)? validator,
+    VoidCallback? onSubmit,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        focusNode: focusNode,
+        obscureText: obscure,
+        keyboardType: keyboardType,
+        textInputAction: nextFocus != null ? TextInputAction.next : TextInputAction.done,
+        style: GoogleFonts.spaceGrotesk(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+          color: AppColors.textPrimary,
+        ),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: GoogleFonts.nunito(
+          fontSize: 14,
+          color: AppColors.textHint,
+        ),
+        prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary, size: 20),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: AppColors.backgroundAlt,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.border, width: 2.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.border, width: 2.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.comicRed, width: 3),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.error, width: 2.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.error, width: 3),
+        ),
+      ),
+      onFieldSubmitted: nextFocus != null
+          ? (_) => FocusScope.of(context).requestFocus(nextFocus)
+          : (_) => onSubmit?.call(),
+      validator: validator,
+    ));
+  }
+
+  Widget _buildComicButton() {
+    return GestureDetector(
+      onTap: _isLoading ? null : _login,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        decoration: BoxDecoration(
+          color: _isLoading ? AppColors.textHint : AppColors.primary,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.ink, width: 2.5),
+          boxShadow: _isLoading
+              ? []
+              : const [
+                  BoxShadow(color: AppColors.ink, offset: Offset(6, 6), blurRadius: 0),
+                ],
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isLoading) ...[
+              const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(width: 10),
+            ] else ...[
+              const Icon(Icons.rocket_launch_rounded, color: AppColors.ink, size: 20),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              _isLoading ? 'LOADING...' : AppStrings.btnLogin.toUpperCase(),
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: AppColors.ink,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoNote() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.ink, width: 2.5),
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppColors.ink, width: 1.5),
+            ),
+            child: const Icon(Icons.info_outline_rounded,
+                size: 14, color: AppColors.ink),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Gunakan NIM kamu sebagai username dan password',
+              style: AppTextStyles.bodySmall.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _comicStar({required double size, required Color color}) {
+    return Icon(Icons.star_rounded, size: size, color: color);
+  }
+}
+
+class _DotPatternPainter extends CustomPainter {
+  final Color color;
+  final double spacing;
+  final double radius;
+
+  const _DotPatternPainter({
+    required this.color,
+    required this.spacing,
+    required this.radius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

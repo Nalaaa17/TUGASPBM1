@@ -38,12 +38,19 @@ class ApiService {
   }
 
   /// Buat header dengan Bearer Token (untuk request terautentikasi)
+  /// WAJIB: Semua endpoint selain login harus menggunakan header ini
   static Future<Map<String, String>> _authHeaders() async {
     final token = await TokenStorage.getToken();
+    if (token == null || token.isEmpty) {
+      throw const ApiException(
+        'Token autentikasi tidak ditemukan. Silakan login terlebih dahulu.',
+        statusCode: 401,
+      );
+    }
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $token',
     };
   }
 
@@ -158,18 +165,38 @@ class ApiService {
     switch (response.statusCode) {
       case 200:
       case 201:
-        if (body is Map<String, dynamic>) return body;
+        if (body is Map<String, dynamic>) {
+          if (body['success'] == false) {
+            final msg = body['message']?.toString() ?? 'Gagal memproses permintaan.';
+            throw ApiException(msg, statusCode: response.statusCode);
+          }
+          return body;
+        }
         return {'data': body};
 
       case 401:
-        throw ApiException(AppStrings.errorUnauthorized,
-            statusCode: response.statusCode);
+        // Token tidak valid atau expired — paksa logout
+        throw ApiException(
+          'Sesi kamu sudah berakhir. Silakan login kembali.',
+          statusCode: 401,
+        );
+
+      case 403:
+        throw ApiException(
+          'Akses ditolak. Kamu tidak memiliki izin.',
+          statusCode: 403,
+        );
+
+      case 404:
+        throw ApiException(
+          'Data tidak ditemukan di server.',
+          statusCode: 404,
+        );
 
       case 422:
         // Validation error dari server
-        final errors = body['errors'] ?? body['message'] ?? 'Validasi gagal';
-        throw ApiException(errors.toString(),
-            statusCode: response.statusCode);
+        final errors = body['errors'] ?? body['message'] ?? 'Data tidak valid';
+        throw ApiException(errors.toString(), statusCode: response.statusCode);
 
       case 500:
       case 502:
